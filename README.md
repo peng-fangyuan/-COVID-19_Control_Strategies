@@ -34,4 +34,4 @@ city.mat
 6. Hubei city 
 hu.mat is to check which city is in Hubei. 
 
-Note: Observed data is from Jan 1 to Mar 15. For mobility data, the data after Mar 15 is the mean value of each city of the week before Mar 15.  
+Note: Observed data is from Jan 1 to Mar 15. For mobility data, the data after Mar 15 is the mean value for each city of the week before Mar 15, which use to conduct long term counterfacutal analysis.   
