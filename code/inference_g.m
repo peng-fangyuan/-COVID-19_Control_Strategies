@@ -5,6 +5,7 @@ load pop %load population
 load in2020_post %load inner-city mobility data in 2020
 load hu % load cityindexs of cities which in Hubei
 M=Mig_post(:,:,10:75);
+mig=Mig_post(:,:,1:75);
 inflow=in2020_post(:,1:66);%.*pop/10e6;
 seed=3000;
 num_loc=size(M,1);%number of locations
@@ -38,7 +39,7 @@ for l=1:num_loc
 end
 num_ens=300;%number of ensemble
 pop0=pop*ones(1,num_ens);
-[x,paramax,paramin]=initialize2(pop0,num_ens,seed,M);%get parameter range
+[x,paramax,paramin]=initialize(pop0,num_ens,seed,M);%get parameter range
 num_var=size(x,1);%number of state variables
 %IF setting
 Iter=10;%number of iterations
@@ -87,19 +88,28 @@ for n=1:Iter
     obs_temp=zeros(num_loc,num_ens,num_times);%records of reported cases
     for t=1:num_times
         [n,t]
-        
+        if n>1
         if t==15
             para=mvnrnd(theta2(:,n)',Sigma,num_ens)';%generate parameters
             x(end-num_para+1:end,:)=para;
         elseif t==25
             para=mvnrnd(theta3(:,n)',Sigma2,num_ens)';%generate parameters
             x(end-num_para+1:end,:)=para;
+            %elseif t==30
+            %    para=mvnrnd(theta4(:,n)',Sigma,num_ens)';%generate parameters
+            %    x(end-num_para+1:end,:)=para;
         elseif t==35
             para=mvnrnd(theta4(:,n)',Sigma2,num_ens)';%generate parameters
             x(end-num_para+1:end,:)=para;
         elseif t==45
             para=mvnrnd(theta5(:,n)',Sigma2,num_ens)';%generate parameters
             x(end-num_para+1:end,:)=para;
+        end
+        else
+            if t==35
+                para=mvnrnd(theta(:,n)',Sigma,num_ens)';%generate parameters
+                x(end,:)=para(5,:);
+            end
         end
         %inflation
         x=mean(x,2)*ones(1,num_ens)+lambda*(x-mean(x,2)*ones(1,num_ens));
@@ -198,7 +208,7 @@ for n=1:Iter
     param(:,:,:,n)=para;
 end
 
-save('para','param');
+save('para2','param');
 end
 
 function x = checkbound_ini(x,pop)
@@ -207,7 +217,7 @@ betalow=0.22;betaup=0.5;%transmission rate
 mulow=0.05;muup=1.0;%relative transmissibility
 Zlow=2;Zup=5;%latency period
 alphalow=0.05;alphaup=1;%reporting rate
-alphalow2=0.05;alphaup2=0.2;%reporting rate
+alphalow2=0.01;alphaup2=0.1;%reporting rate
 D2low=3;D2up=5;%infectious period
 Dlow=1;Dup=3;%infectious period
 xmin=[mulow;betalow;mulow;Zlow;alphalow;Dlow;D2low;alphalow2];
